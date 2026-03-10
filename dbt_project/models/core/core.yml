@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension table"
+    columns:
+      - name: customer_unique_id
+        description: "Unique identifier for a customer across multiple orders"
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_products
+    description: "Product dimension table"
+    columns:
+      - name: product_id
+        description: "Unique identifier for a product"
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_sellers
+    description: "Seller dimension table"
+    columns:
+      - name: seller_id
+        description: "Unique identifier for a seller"
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_orders
+    description: "Fact table containing order level details"
+    columns:
+      - name: order_id
+        description: "Unique identifier for a single order"
+        tests:
+          - unique
+          - not_null
+      - name: order_status
+        description: "Status of the order"
+        tests:
+          - accepted_values:
+              values: ['delivered', 'shipped', 'invoiced', 'canceled', 'processing', 'unavailable', 'approved', 'created']
+
+  - name: fct_order_items
+    description: "Fact table for individual items within an order"
+    columns:
+      - name: order_item_id
+        description: "Sequential number identifying number of items included in the same order"
+      - name: order_id
+        tests:
+          - not_null
+      - name: price
+        description: "Item price"
+      - name: freight_value
+        description: "Item freight value"

@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw_olist
+    database: ntu-data-science-ai
+    schema: raw_olist
+    tables:
+      - name: customers
+      - name: order_items
+      - name: orders
+      - name: products
+      - name: sellers

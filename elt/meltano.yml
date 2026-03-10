@@ -1,0 +1,37 @@
+default_environment: dev
+project_id: 019cd570-087f-78ed-85d1-032c8d86c26f
+environments:
+- name: dev
+- name: staging
+- name: prod
+plugins:
+  extractors:
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      files:
+        - entity: customers
+          path: ../data/olist_customers_dataset.csv
+          keys: [customer_id]
+        - entity: order_items
+          path: ../data/olist_order_items_dataset.csv
+          keys: [order_item_id, order_id]
+        - entity: orders
+          path: ../data/olist_orders_dataset.csv
+          keys: [order_id]
+        - entity: products
+          path: ../data/olist_products_dataset.csv
+          keys: [product_id]
+        - entity: sellers
+          path: ../data/olist_sellers_dataset.csv
+          keys: [seller_id]
+  loaders:
+  - name: target-bigquery
+    variant: z3z1ma
+    pip_url: git+https://github.com/z3z1ma/target-bigquery.git
+    config:
+      project: ntu-data-science-ai
+      dataset: raw_olist
+      location: US
+      credentials_path: "/Users/kwijanto/Documents/Documents - KW’s MacBook Air/codes/ntu-project-2/ntu-data-science-ai-4d35c69fac50.json"

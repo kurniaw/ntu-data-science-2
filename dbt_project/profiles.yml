@@ -1,0 +1,14 @@
+dbt_project:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: ntu-data-science-ai
+      dataset: stg_olist
+      threads: 4
+      keyfile: "/Users/kwijanto/Documents/Documents - KW’s MacBook Air/codes/ntu-project-2/ntu-data-science-ai-4d35c69fac50.json"
+      timeout_seconds: 300
+      priority: interactive
+      retries: 1
+      location: US
