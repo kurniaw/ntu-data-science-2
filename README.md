@@ -18,6 +18,9 @@ Create new .env file and replace the placeholders with your own values.
 GCP_PROJECT_ID=<gcp project id>
 GCP_CREDENTIALS_PATH=<absolute path to json file>
 ```
+Modify the following files to replace the placeholders with your own values:
+- `elt/meltano.yml`
+- `dbt_project/profiles.yml`
 
 ## 2. Data Ingestion (ELT)
 We use `meltano` to move our raw CSV data into BigQuery.
