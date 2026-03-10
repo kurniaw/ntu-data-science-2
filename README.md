@@ -13,6 +13,12 @@ conda env create -f environment.yml
 conda activate ntu-project-2
 ```
 
+Create new .env file and replace the placeholders with your own values.
+```
+GCP_PROJECT_ID=<gcp project id>
+GCP_CREDENTIALS_PATH=<absolute path to json file>
+```
+
 ## 2. Data Ingestion (ELT)
 We use `meltano` to move our raw CSV data into BigQuery.
 The current source data resides in `data/*.csv`.
