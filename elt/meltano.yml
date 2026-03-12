@@ -31,7 +31,10 @@ plugins:
     variant: z3z1ma
     pip_url: git+https://github.com/z3z1ma/target-bigquery.git
     config:
-      project: <gcp project id>
+      project: ntu-data-science-ai
       dataset: raw_olist
+      denormalized: true
+      flattening_enabled: true
+      flattening_max_depth: 1
       location: US
-      credentials_path: <absolute path to json file>
+      credentials_path: "/Users/kwijanto/Documents/Documents - KW’s MacBook Air/codes/ntu-project-2/ntu-data-science-ai-4d35c69fac50.json"
