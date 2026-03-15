@@ -2,6 +2,9 @@
 
 This project repository contains the setup for a production data warehouse using BigQuery. The architecture involves an ELT (Extract, Load, Transform) pipeline orchestrated via **Meltano**, transformations performed with **dbt**, and data validation using **Great Expectations**.
 
+![Brazilian E-Commerce Data Schema](assets/brazilian_ecommerce_data_schema.png)
+Source: [https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+
 ## Prerequisites
 - **Conda**: Ensure you have Miniconda or Anaconda installed.
 - **Google Cloud Platform**: A valid GCP Project with BigQuery enabled, and a Service Account with `BigQuery Data Editor` and `BigQuery Job User` roles.
@@ -28,12 +31,13 @@ The current source data resides in `data/*.csv`.
 
 **Setup Meltano**:
 ```bash
-meltano install
+meltano install --plugin-type loader target-bigquery
 ```
 
 **Run Pipeline**:
 This will extract data using `tap-csv` and load it into your BigQuery project via `target-bigquery`.
 ```bash
+cd elt
 meltano elt tap-csv target-bigquery
 ```
 
@@ -49,11 +53,13 @@ The data is transformed according to a Star Schema directly within BigQuery usin
 **Run dbt Models**:
 ```bash
 cd dbt_project
-dbt parse
-dbt run
-dbt test
-dbt snapshot
+dbt deps                  # install packages (e.g. dbt_utils)
+dbt run                   # build all layers: staging → core → analytics
+dbt snapshot              # capture Type-2 SCD snapshots
+dbt test                  # run data quality tests
 ```
+
+> Run `dbt run` before `dbt run --select "analytics.*"` — the analytics layer depends on core models (`fct_orders`, `dim_customers`, `dim_products`) that must be materialised first.
 
 ## 4. Data Validation
 To ensure incoming `data/*.csv` constraints (like non-negative prices, correct date formats) before hitting downstream dependencies, we employ Great Expectations.

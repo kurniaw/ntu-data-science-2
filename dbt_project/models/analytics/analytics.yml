@@ -1,0 +1,147 @@
+version: 2
+
+models:
+  # ===== ANALYTICS-SPECIFIC DIMENSIONS =====
+  # NOTE: dim_customers, dim_products, dim_sellers are in the core layer
+  # This analytics layer adds supplementary dimensions and fact tables
+  
+  - name: dim_date
+    description: |
+      Calendar dimension table for time-based analysis.
+      Type 1 SCD - Static data, no changes tracked.
+      Contains one row per calendar day from 5 years in the past to 5 years in the future.
+    columns:
+      - name: date_key
+        description: Surrogate key - YYYYMMDD format integer
+        tests:
+          - unique
+          - not_null
+      - name: calendar_date
+        description: Actual calendar date
+        tests:
+          - unique
+          - not_null
+      - name: year
+        description: Calendar year
+      - name: quarter
+        description: Calendar quarter (1-4)
+      - name: month
+        description: Calendar month (1-12)
+      - name: day_of_month
+        description: Day of month (1-31)
+      - name: day_of_week
+        description: Day of week (1=Monday, 7=Sunday)
+      - name: week_of_year
+        description: ISO week number (1-53)
+      - name: day_name
+        description: Day name (Monday, Tuesday, etc.)
+      - name: month_name
+        description: Month name (January, February, etc.)
+      - name: is_weekend
+        description: Boolean flag indicating weekend day
+      - name: is_holiday
+        description: Boolean flag indicating Brazilian holiday
+      - name: days_since_epoch
+        description: Days since 1970-01-01 (for calculations)
+
+  - name: dim_geography
+    description: |
+      Geographic dimension for zip code prefixes and cities.
+      Type 1 SCD - Locations don't change.
+      Shared dimension for both customers and sellers.
+    columns:
+      - name: location_key
+        description: Surrogate key
+        tests:
+          - unique
+          - not_null
+      - name: zip_code_prefix
+        description: Postal code prefix from source data
+      - name: city
+        description: City name
+      - name: state
+        description: State abbreviation (BR-UF)
+      - name: latitude
+        description: Geographic latitude coordinate
+      - name: longitude
+        description: Geographic longitude coordinate
+      - name: region
+        description: Brazilian region (North, Northeast, West, South, Southeast)
+
+  - name: dim_payment_type
+    description: |
+      Payment method reference dimension.
+      Type 1 SCD - Static lookup table.
+    columns:
+      - name: payment_type_key
+        description: Surrogate key
+        tests:
+          - unique
+          - not_null
+      - name: payment_type_name
+        description: Payment type name (credit_card, debit_card, boleto, etc.)
+        tests:
+          - unique
+          - not_null
+      - name: payment_channel
+        description: Channel classification (online, offline, other)
+      - name: requires_installments
+        description: Boolean flag - can payment be split into installments
+      - name: payment_risk_level
+        description: Risk classification (low, medium, high)
+
+  - name: dim_product_category
+    description: |
+      Product category dimension with English translations.
+      Type 2 SCD - Tracks historical category name changes.
+      Latest version has is_current = true.
+    columns:
+      - name: category_key
+        description: Surrogate key
+        tests:
+          - unique
+          - not_null
+      - name: category_name
+        description: Portuguese category name (natural key)
+      - name: category_name_english
+        description: English translated category name (natural key)
+      - name: category_type
+        description: Grouped category type (Electronics, Fashion, Home, etc.)
+      - name: valid_from_date
+        description: SCD Type 2 - Start date for this version
+      - name: valid_to_date
+        description: SCD Type 2 - End date (NULL for current)
+      - name: is_current
+        description: SCD Type 2 - Boolean flag for latest version
+
+
+
+  # ===== ANALYTICS-SPECIFIC FACT TABLES =====
+  # NOTE: fct_orders and fct_order_items are in the core layer
+  
+  - name: fct_product_reviews
+    description: |
+      Product reviews fact table at review grain.
+      Grain: One row per review.
+      Links reviews to orders, products, and customers via core fact/dimension tables.
+      References: fct_orders, dim_products, dim_customers (from core layer)
+    columns:
+      - name: review_key
+        description: Surrogate key - unique per review
+        tests:
+          - unique
+          - not_null
+      - name: review_id
+        description: Natural key - operational review ID
+      - name: order_key
+        description: Foreign key to fct_orders (core.fct_orders)
+      - name: product_key
+        description: Foreign key to dim_products (core.dim_products)
+      - name: customer_key
+        description: Foreign key to dim_customers (core.dim_customers)
+      - name: review_date_key
+        description: Foreign key to dim_date (analytics.dim_date)
+      - name: review_score
+        description: Review score (1-5 stars)
+      - name: review_sentiment
+        description: Derived sentiment from score (positive, neutral, negative)
