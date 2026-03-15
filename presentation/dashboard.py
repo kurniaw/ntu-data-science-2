@@ -369,6 +369,83 @@ def q_total_products() -> int:
     return int(df.iloc[0]["n"])
 
 
+# ── Geography & Logistics queries ─────────────────────────────────────────────
+
+@st.cache_data(ttl=3600)
+def q_customer_order_map() -> pd.DataFrame:
+    return _bq(f"""
+    WITH geo AS (
+        SELECT zip_code_prefix,
+               AVG(SAFE_CAST(latitude  AS FLOAT64)) AS lat,
+               AVG(SAFE_CAST(longitude AS FLOAT64)) AS lng,
+               ANY_VALUE(city)    AS city,
+               ANY_VALUE(state)   AS state,
+               ANY_VALUE(region)  AS region
+        FROM {_tbl(ANALYTICS, 'dim_geography')}
+        GROUP BY 1
+    )
+    SELECT
+        g.lat, g.lng, g.city, g.state, g.region,
+        COUNT(DISTINCT o.order_id)  AS orders,
+        SUM(oi.price)               AS revenue
+    FROM {_tbl(CORE, 'fct_orders')} o
+    JOIN {_tbl(CORE, 'dim_customers')}   c  ON o.customer_unique_id = c.customer_unique_id
+    JOIN {_tbl(CORE, 'fct_order_items')} oi ON o.order_id           = oi.order_id
+    JOIN geo g ON CAST(c.customer_zip_code AS INT64) = CAST(g.zip_code_prefix AS INT64)
+    WHERE g.lat IS NOT NULL
+    GROUP BY 1,2,3,4,5
+    """)
+
+
+@st.cache_data(ttl=3600)
+def q_seller_map() -> pd.DataFrame:
+    return _bq(f"""
+    WITH geo AS (
+        SELECT zip_code_prefix,
+               AVG(SAFE_CAST(latitude  AS FLOAT64)) AS lat,
+               AVG(SAFE_CAST(longitude AS FLOAT64)) AS lng,
+               ANY_VALUE(city)   AS city,
+               ANY_VALUE(state)  AS state,
+               ANY_VALUE(region) AS region
+        FROM {_tbl(ANALYTICS, 'dim_geography')}
+        GROUP BY 1
+    ),
+    sellers AS (
+        SELECT seller_zip_code, COUNT(DISTINCT seller_id) AS seller_count
+        FROM {_tbl(CORE, 'dim_sellers')}
+        GROUP BY 1
+    )
+    SELECT g.lat, g.lng, g.city, g.state, g.region, s.seller_count
+    FROM sellers s
+    JOIN geo g ON CAST(s.seller_zip_code AS INT64) = CAST(g.zip_code_prefix AS INT64)
+    WHERE g.lat IS NOT NULL
+    """)
+
+
+@st.cache_data(ttl=3600)
+def q_regional_performance() -> pd.DataFrame:
+    return _bq(f"""
+    WITH geo AS (
+        SELECT zip_code_prefix, ANY_VALUE(region) AS region
+        FROM {_tbl(ANALYTICS, 'dim_geography')}
+        GROUP BY 1
+    )
+    SELECT
+        g.region,
+        COUNT(DISTINCT o.order_id)                                              AS orders,
+        SUM(oi.price)                                                           AS revenue,
+        AVG(DATE_DIFF(o.order_delivered_customer_date,
+                      o.order_purchase_timestamp, DAY))                         AS avg_delivery_days
+    FROM {_tbl(CORE, 'fct_orders')} o
+    JOIN {_tbl(CORE, 'dim_customers')}   c  ON o.customer_unique_id = c.customer_unique_id
+    JOIN {_tbl(CORE, 'fct_order_items')} oi ON o.order_id           = oi.order_id
+    JOIN geo g ON CAST(c.customer_zip_code AS INT64) = CAST(g.zip_code_prefix AS INT64)
+    WHERE o.order_delivered_customer_date IS NOT NULL
+    GROUP BY 1
+    ORDER BY revenue DESC
+    """)
+
+
 # ── Formatters ────────────────────────────────────────────────────────────────
 def _brl(v: float) -> str:
     return f"R${v:,.0f}"
@@ -460,12 +537,13 @@ st.markdown("---")
 # ══════════════════════════════════════════════════════════════════════════════
 # TABS
 # ══════════════════════════════════════════════════════════════════════════════
-TAB_OVERVIEW, TAB_REVENUE, TAB_CUSTOMERS, TAB_OPS, TAB_PRODUCTS = st.tabs([
+TAB_OVERVIEW, TAB_REVENUE, TAB_CUSTOMERS, TAB_OPS, TAB_PRODUCTS, TAB_GEO = st.tabs([
     "📊 Overview",
     "💰 Revenue & Growth",
     "👥 Customer Intelligence",
     "🚚 Operations & Delivery",
     "⭐ Products & Sentiment",
+    "🗺️ Geography & Logistics",
 ])
 
 
@@ -868,3 +946,133 @@ with TAB_PRODUCTS:
         fig3.update_layout(**_layout("Monthly Avg Review Score", 360))
         fig3.update_yaxes(range=[1, 5.5], title="Avg Score")
         st.plotly_chart(fig3, use_container_width=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 6 — GEOGRAPHY & LOGISTICS
+# ══════════════════════════════════════════════════════════════════════════════
+with TAB_GEO:
+    cust_map  = q_customer_order_map()
+    sell_map  = q_seller_map()
+    region_df = q_regional_performance()
+
+    # ── KPI row ───────────────────────────────────────────────────────────────
+    g1, g2, g3, g4 = st.columns(4)
+    regions_covered = region_df["region"].nunique() if not region_df.empty else 0
+    states_covered  = cust_map["state"].nunique()   if not cust_map.empty  else 0
+    cities_covered  = cust_map["city"].nunique()    if not cust_map.empty  else 0
+
+    # Delivery gap: North vs Southeast (worst vs best)
+    if not region_df.empty and len(region_df) >= 2:
+        max_days = region_df["avg_delivery_days"].max()
+        min_days = region_df["avg_delivery_days"].min()
+        delivery_gap = max_days - min_days
+    else:
+        delivery_gap = 0.0
+
+    g1.metric("Regions Covered",    str(regions_covered))
+    g2.metric("States with Orders", str(states_covered))
+    g3.metric("Cities with Orders", f"{cities_covered:,}")
+    g4.metric("Max–Min Delivery Gap", f"{delivery_gap:.1f} days",
+              help="Difference in avg delivery days between slowest and fastest region")
+
+    st.markdown("---")
+
+    # ── Demand density heatmap ────────────────────────────────────────────────
+    if not cust_map.empty:
+        fig_density = px.density_mapbox(
+            cust_map, lat="lat", lon="lng", z="orders",
+            radius=18,
+            hover_data={"city": True, "state": True, "orders": True,
+                        "revenue": ":.0f", "lat": False, "lng": False},
+            color_continuous_scale=["#0f172a", PAL["blue"], PAL["teal"], "#f0fdf4"],
+            labels={"orders": "Orders", "revenue": "Revenue (R$)"},
+        )
+        fig_density.update_layout(
+            mapbox_style="carto-darkmatter",
+            mapbox_center={"lat": -14.2, "lon": -51.9},
+            mapbox_zoom=3,
+            paper_bgcolor=BG,
+            margin=dict(l=0, r=0, t=36, b=0),
+            height=460,
+            title=dict(text="Customer Order Demand Density", font=dict(color=FONT, size=13)),
+            coloraxis_colorbar=dict(
+                title=dict(text="Orders", font=dict(color=MUTED)),
+                tickfont=dict(color=MUTED),
+                bgcolor=BG,
+            ),
+        )
+        st.plotly_chart(fig_density, use_container_width=True)
+
+    st.markdown("---")
+
+    # ── Coverage map + Regional performance ───────────────────────────────────
+    col_map, col_reg = st.columns([3, 2])
+
+    with col_map:
+        fig_cov = go.Figure()
+        if not cust_map.empty:
+            # Normalise marker size to 4–20px range
+            max_orders = cust_map["orders"].max() or 1
+            sizes = (cust_map["orders"] / max_orders * 16 + 4).clip(4, 20)
+            fig_cov.add_trace(go.Scattermapbox(
+                lat=cust_map["lat"], lon=cust_map["lng"],
+                mode="markers",
+                marker=dict(size=sizes, color=PAL["blue"], opacity=0.55),
+                text=cust_map["city"] + ", " + cust_map["state"]
+                     + "<br>Orders: " + cust_map["orders"].astype(str),
+                hoverinfo="text",
+                name="Customers",
+            ))
+        if not sell_map.empty:
+            fig_cov.add_trace(go.Scattermapbox(
+                lat=sell_map["lat"], lon=sell_map["lng"],
+                mode="markers",
+                marker=dict(size=7, color=PAL["amber"], opacity=0.75),
+                text=sell_map["city"] + ", " + sell_map["state"]
+                     + "<br>Sellers: " + sell_map["seller_count"].astype(str),
+                hoverinfo="text",
+                name="Sellers",
+            ))
+        fig_cov.update_layout(
+            mapbox_style="carto-darkmatter",
+            mapbox_center={"lat": -14.2, "lon": -51.9},
+            mapbox_zoom=3,
+            paper_bgcolor=BG,
+            margin=dict(l=0, r=0, t=36, b=0),
+            height=420,
+            title=dict(text="Customer Demand vs Seller Supply Coverage",
+                       font=dict(color=FONT, size=13)),
+            legend=dict(bgcolor=BG, font=dict(color=FONT, size=11),
+                        x=0.01, y=0.99),
+        )
+        st.plotly_chart(fig_cov, use_container_width=True)
+
+    with col_reg:
+        if not region_df.empty:
+            fig_reg = go.Figure()
+            fig_reg.add_trace(go.Bar(
+                x=region_df["region"], y=region_df["revenue"],
+                name="Revenue (R$)",
+                marker_color=PAL["blue"],
+                opacity=0.85,
+                yaxis="y1",
+            ))
+            fig_reg.add_trace(go.Scatter(
+                x=region_df["region"], y=region_df["avg_delivery_days"],
+                name="Avg Delivery Days",
+                mode="lines+markers",
+                line=dict(color=PAL["amber"], width=2.2),
+                marker=dict(size=6),
+                yaxis="y2",
+            ))
+            fig_reg.update_layout(**_layout("Revenue & Delivery Days by Region", 420))
+            fig_reg.update_layout(
+                yaxis=dict(title="Revenue (R$)", gridcolor=GRID,
+                           tickprefix="R$", tickformat=",.0f", tickfont=dict(color=MUTED)),
+                yaxis2=dict(title="Avg Delivery Days", overlaying="y", side="right",
+                            gridcolor="rgba(0,0,0,0)", tickfont=dict(color=MUTED)),
+                barmode="overlay",
+                legend=dict(x=0.01, y=0.99, bgcolor=BG),
+            )
+            st.plotly_chart(fig_reg, use_container_width=True)
