@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "id": "99d57560-ab54-4297-b11b-a065708b191c",
+      "kwargs": {
+        "column": "product_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    }
+  ],
+  "id": "4035a5ca-ef37-4b92-b5ac-dc60bd292b79",
+  "meta": {
+    "great_expectations_version": "1.8.0"
+  },
+  "name": "olist_products_suite",
+  "notes": null
+}

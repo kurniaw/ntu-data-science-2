@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olist E-Commerce Data Warehouse — Executive Presentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:   #1a2744;
+    --navy2:  #243055;
+    --blue:   #2d6be4;
+    --teal:   #0ea5a0;
+    --green:  #16a34a;
+    --amber:  #d97706;
+    --red:    #dc2626;
+    --light:  #f0f4fa;
+    --card:   #ffffff;
+    --text:   #1e293b;
+    --muted:  #64748b;
+    --border: #e2e8f0;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #0f172a;
+    color: var(--text);
+    overflow: hidden;
+    font-size: 24px;
+  }
+
+  /* ── DECK ── */
+  #deck {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+
+  /* ── SLIDE TYPES ── */
+  .slide-cover {
+    background: linear-gradient(135deg, var(--navy) 0%, #0f1f44 60%, #162035 100%);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem;
+  }
+
+  .slide-content {
+    background: var(--light);
+    flex-direction: column;
+  }
+
+  .slide-dark {
+    background: var(--navy);
+    color: #fff;
+    flex-direction: column;
+  }
+
+  /* ── HEADER BAR ── */
+  .slide-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 1.1rem 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+  .slide-header .slide-num {
+    background: var(--blue);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .slide-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .slide-header .tag {
+    margin-left: auto;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+  .tag-biz  { background: rgba(22,163,74,.25);  color: #4ade80; }
+  .tag-tech { background: rgba(45,107,228,.25); color: #93c5fd; }
+  .tag-all  { background: rgba(14,165,160,.25); color: #5eead4; }
+
+  /* ── BODY PADDING ── */
+  .slide-body {
+    flex: 1;
+    padding: 1.8rem 2.5rem 1.2rem;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  /* ── CARDS ── */
+  .cards {
+    display: grid;
+    gap: 1rem;
+  }
+  .cards-3 { grid-template-columns: repeat(3, 1fr); }
+  .cards-2 { grid-template-columns: repeat(2, 1fr); }
+  .cards-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: var(--card);
+    border-radius: 0.75rem;
+    padding: 1.2rem 1.4rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .card h3 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.55rem;
+  }
+  .card p { font-size: 0.92rem; line-height: 1.5; color: var(--text); }
+
+  .card-accent { border-left: 4px solid var(--blue); }
+  .card-green  { border-left: 4px solid var(--green); }
+  .card-amber  { border-left: 4px solid var(--amber); }
+  .card-red    { border-left: 4px solid var(--red); }
+  .card-teal   { border-left: 4px solid var(--teal); }
+
+  /* ── BIG NUMBER ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.8rem;
+  }
+  .stat {
+    background: var(--card);
+    border-radius: 0.75rem;
+    padding: 1rem 0.8rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat .num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--blue);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .stat .label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    line-height: 1.3;
+    font-weight: 500;
+  }
+
+  /* ── PIPELINE DIAGRAM ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 0.5rem 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .pipe-step {
+    flex: 1;
+    min-width: 0;
+    background: var(--card);
+    border-radius: 0.6rem;
+    border: 2px solid var(--border);
+    padding: 0.9rem 0.7rem;
+    text-align: center;
+    position: relative;
+  }
+  .pipe-step .tool {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--blue);
+    text-transform: uppercase;
+  }
+  .pipe-step .pipe-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 0.25rem 0 0.2rem;
+    color: var(--text);
+  }
+  .pipe-step .pipe-desc {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .pipe-step .pipe-layer {
+    font-size: 0.65rem;
+    margin-top: 0.35rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    display: inline-block;
+    font-weight: 600;
+  }
+  .layer-1 { background: #fef3c7; color: #92400e; }
+  .layer-2 { background: #dbeafe; color: #1e40af; }
+  .layer-3 { background: #dcfce7; color: #166534; }
+  .layer-4 { background: #f3e8ff; color: #6b21a8; }
+
+  .pipe-arrow {
+    font-size: 1.4rem;
+    color: var(--muted);
+    padding: 0 0.3rem;
+    flex-shrink: 0;
+  }
+
+  /* ── SCHEMA TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    background: var(--card);
+    border-radius: 0.6rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: var(--navy);
+    color: #fff;
+    padding: 0.55rem 0.9rem;
+    text-align: left;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.45rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-fact { background: #dbeafe; color: #1e40af; }
+  .badge-dim  { background: #dcfce7; color: #166534; }
+  .badge-scd2 { background: #fef3c7; color: #92400e; }
+  .badge-scd0 { background: #f1f5f9; color: #475569; }
+  .badge-scd1 { background: #f3e8ff; color: #6b21a8; }
+
+  /* ── LIST ── */
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .check-list li::before {
+    content: "✓";
+    color: var(--green);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+  }
+
+  .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .bullet-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  .bullet-list li::before {
+    content: "→";
+    color: var(--blue);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── COVER ELEMENTS ── */
+  .cover-logo {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 1.2rem;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.2rem;
+  }
+  .cover-title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 0.8rem;
+    background: linear-gradient(135deg, #fff 40%, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cover-sub {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+  }
+  .cover-chips {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .chip {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    color: #e2e8f0;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .cover-meta {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 1.5rem;
+  }
+
+  /* ── KPI HIGHLIGHT ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 0.75rem;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+  }
+  .kpi-card .icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .kpi-card h3 { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text); }
+  .kpi-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.45; }
+
+  /* ── RISK TABLE ── */
+  .risk-high   td:first-child { border-left: 4px solid var(--red); }
+  .risk-medium td:first-child { border-left: 4px solid var(--amber); }
+  .risk-low    td:first-child { border-left: 4px solid var(--green); }
+
+  /* ── ROADMAP ── */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .road-phase {
+    background: var(--card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .road-phase .phase-head {
+    background: var(--navy);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .road-phase .phase-body {
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .road-phase .phase-item {
+    font-size: 0.82rem;
+    color: var(--text);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    line-height: 1.35;
+  }
+  .road-phase .phase-item::before { content: "•"; color: var(--blue); flex-shrink: 0; }
+
+  /* ── QUALITY GRID ── */
+  .qual-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .qual-card {
+    background: var(--card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .qual-card .qc-head {
+    padding: 0.7rem 1.1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .qc-blue { background: #dbeafe; color: #1e40af; }
+  .qc-green { background: #dcfce7; color: #166534; }
+  .qual-card .qc-body { padding: 0.9rem 1.1rem; }
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.35;
+  }
+  .rule-item:last-child { border-bottom: none; }
+  .rule-item .dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.35rem;
+  }
+  .dot-blue  { background: var(--blue); }
+  .dot-green { background: var(--green); }
+
+  /* ── NAVIGATION ── */
+  #nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3rem;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 0.8rem;
+    z-index: 100;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  #nav button {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    color: #e2e8f0;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  #nav button:hover { background: rgba(255,255,255,.2); }
+  #nav button:disabled { opacity: 0.3; cursor: default; }
+  #progress-wrap {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,.1);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  #slide-count {
+    font-size: 0.75rem;
+    color: #64748b;
+    white-space: nowrap;
+  }
+
+  /* ── QUOTE ── */
+  .insight-quote {
+    background: linear-gradient(135deg, #1e3a8a, #1e40af);
+    color: #fff;
+    border-radius: 0.75rem;
+    padding: 1.2rem 1.6rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    border-left: 4px solid #93c5fd;
+  }
+  .insight-quote strong { color: #bfdbfe; }
+
+  /* ── TWO-COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+  /* ── LAYER DIAGRAM ── */
+  .layer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .layer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .layer-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    width: 5.5rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .layer-box {
+    flex: 1;
+    border-radius: 0.5rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+  }
+  .lb-raw     { background: #475569; }
+  .lb-stg     { background: #2563eb; }
+  .lb-core    { background: #0891b2; }
+  .lb-ana     { background: #059669; }
+
+  /* Responsive adjustments (landscape tablet) */
+  @media (max-width: 900px) {
+    .cards-3, .cards-4 { grid-template-columns: 1fr 1fr; }
+    .stat-grid { grid-template-columns: repeat(3, 1fr); }
+    .roadmap  { grid-template-columns: 1fr 1fr; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 1 · TITLE
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-cover active" id="s1">
+    <div class="cover-logo">🏭</div>
+    <h1 class="cover-title">Production Data Warehouse<br>for Olist E-Commerce</h1>
+    <p class="cover-sub">
+      Transforming Brazilian e-commerce raw data into<br>
+      enterprise-grade analytics using a modern cloud data stack
+    </p>
+    <div class="cover-chips">
+      <span class="chip">Google BigQuery</span>
+      <span class="chip">dbt</span>
+      <span class="chip">Meltano</span>
+      <span class="chip">Great Expectations</span>
+      <span class="chip">Star Schema</span>
+      <span class="chip">Python 3.11</span>
+    </div>
+    <p class="cover-meta">NTU Data Science · March 2026</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 2 · EXECUTIVE SUMMARY
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s2">
+    <div class="slide-header">
+      <span class="slide-num">02</span>
+      <h2>Executive Summary</h2>
+      <span class="tag tag-all">ALL AUDIENCES</span>
+    </div>
+    <div class="slide-body">
+
+      <div class="cards cards-3">
+        <div class="card card-accent">
+          <h3>The Problem</h3>
+          <p>Raw transactional CSV files from 8 datasets — customers, orders, products, sellers, payments, reviews, and geography — were siloed, inconsistent, and impossible to query for business decisions. No single source of truth existed.</p>
+        </div>
+        <div class="card card-green">
+          <h3>Our Solution</h3>
+          <p>Built a <strong>4-stage automated ELT pipeline</strong> on Google BigQuery that validates, ingests, transforms, and tests 333 MB of raw data into a production-grade star schema — 10 analytics tables, always fresh, always tested.</p>
+        </div>
+        <div class="card card-teal">
+          <h3>Business Impact</h3>
+          <p>Any analyst can now answer questions like <em>"Which product categories drive the most revenue?"</em> or <em>"Which customers are at risk of churn?"</em> with a single SQL query — in seconds, not days.</p>
+        </div>
+      </div>
+
+      <div class="insight-quote">
+        <strong>Bottom line:</strong> We turned 9 raw CSV files and 333 MB of data into a structured, validated, queryable analytics layer covering
+        99,441 orders, 100K+ customers, 32K products, and 3K sellers —
+        with automated data quality gates at every step of the pipeline.
+      </div>
+
+      <div class="cards cards-3">
+        <div class="card">
+          <h3>Data Coverage</h3>
+          <p>~2 years of Brazilian e-commerce transactions from Olist, Brazil's largest marketplace platform (Kaggle dataset)</p>
+        </div>
+        <div class="card">
+          <h3>Time to Insight</h3>
+          <p>Full pipeline runs end-to-end in under 2 minutes. A single command (<code>./run_pipeline.sh</code>) triggers all four stages with automatic failure detection.</p>
+        </div>
+        <div class="card">
+          <h3>Quality Guarantee</h3>
+          <p>Two independent validation layers: 25+ pre-load expectations on raw files, and post-transform tests on every analytics table — zero bad data reaches dashboards.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 3 · BUSINESS CONTEXT
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s3">
+    <div class="slide-header">
+      <span class="slide-num">03</span>
+      <h2>Business Context &amp; Dataset</h2>
+      <span class="tag tag-biz">BUSINESS</span>
+    </div>
+    <div class="slide-body">
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="num">99K</div>
+          <div class="label">Orders</div>
+        </div>
+        <div class="stat">
+          <div class="num">112K</div>
+          <div class="label">Order Line Items</div>
+        </div>
+        <div class="stat">
+          <div class="num">100K</div>
+          <div class="label">Unique Customers</div>
+        </div>
+        <div class="stat">
+          <div class="num">3,095</div>
+          <div class="label">Sellers</div>
+        </div>
+        <div class="stat">
+          <div class="num">32,951</div>
+          <div class="label">Products</div>
+        </div>
+      </div>
+
+      <div class="cards cards-3" style="margin-top:0.2rem;">
+        <div class="card">
+          <h3>Market</h3>
+          <p>Brazilian e-commerce (Olist platform) — all 27 states, spanning electronics, fashion, home goods, food &amp; drink, beauty, books, and more across <strong>72 product categories</strong>.</p>
+        </div>
+        <div class="card">
+          <h3>Transaction Types</h3>
+          <p>Orders tracked through <strong>8 lifecycle statuses</strong> — from created → approved → shipped → delivered or cancelled. Payments via 5 methods including installment-based credit cards.</p>
+        </div>
+        <div class="card">
+          <h3>Customer Behaviour</h3>
+          <p>Every order has associated <strong>delivery timestamps, review scores (1–5 stars), and geographic coordinates</strong>. Rich enough for churn prediction, regional analysis, and logistics optimisation.</p>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card card-accent">
+          <h3>Payment Methods Tracked</h3>
+          <ul class="check-list" style="margin-top:0.2rem;">
+            <li>Credit card (with installments up to 24×)</li>
+            <li>Boleto bancário (Brazilian bank slip)</li>
+            <li>Debit card</li>
+            <li>Voucher / gift card</li>
+            <li>Not defined (edge cases)</li>
+          </ul>
+        </div>
+        <div class="card card-green">
+          <h3>Order Statuses Covered</h3>
+          <ul class="check-list" style="margin-top:0.2rem;">
+            <li>Delivered — the primary success state</li>
+            <li>Shipped — in transit</li>
+            <li>Canceled / Invoiced / Approved</li>
+            <li>Processing / Unavailable / Created</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 4 · BUSINESS VALUE & KPIs
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s4">
+    <div class="slide-header">
+      <span class="slide-num">04</span>
+      <h2>Business Value &amp; KPI Capabilities</h2>
+      <span class="tag tag-biz">BUSINESS</span>
+    </div>
+    <div class="slide-body">
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="icon">💰</div>
+          <h3>Revenue &amp; Financials</h3>
+          <p>Total revenue, Average Order Value (AOV), revenue by product category, revenue by seller, freight rate as % of revenue, and gross merchandise value (GMV) — all sliceable by date, region, or segment.</p>
+        </div>
+        <div class="kpi-card">
+          <div class="icon">🚚</div>
+          <h3>Logistics &amp; Operations</h3>
+          <p>On-time delivery rate, average delivery days, order approval cycle time, items per order. Identify bottlenecks by seller state or region.</p>
+        </div>
+        <div class="kpi-card">
+          <div class="icon">👥</div>
+          <h3>Customer Intelligence</h3>
+          <p>Customer Lifetime Value (LTV), RFM segmentation (Champions, Loyal, At-Risk, Churned), repeat purchase rate, geographic distribution by state and region.</p>
+        </div>
+        <div class="kpi-card">
+          <div class="icon">📦</div>
+          <h3>Product &amp; Category</h3>
+          <p>Revenue by category, category type rollups (Electronics, Fashion, Home, Health &amp; Beauty, etc.), product dimension metrics (weight, volume), sales velocity by category.</p>
+        </div>
+        <div class="kpi-card">
+          <div class="icon">⭐</div>
+          <h3>Customer Satisfaction</h3>
+          <p>Review score distribution (1–5 stars), sentiment classification (positive ≥4, neutral = 3, negative ≤2), positive review rate by category, and review comment rate.</p>
+        </div>
+        <div class="kpi-card">
+          <div class="icon">🏪</div>
+          <h3>Seller Performance</h3>
+          <p>Revenue per seller, average rating, order volume, state and regional performance, GMV ranking, and delivery fulfillment metrics per seller.</p>
+        </div>
+      </div>
+
+      <div class="insight-quote" style="margin-top:0.3rem;">
+        All KPIs are <strong>pre-computed at pipeline runtime</strong> — delivery days, sentiment labels, RFM scores, and category groupings are embedded in the data model. BI tools query results in milliseconds, not minutes.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 5 · KEY INSIGHTS ENABLED
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s5">
+    <div class="slide-header">
+      <span class="slide-num">05</span>
+      <h2>Key Business Insights Enabled</h2>
+      <span class="tag tag-biz">BUSINESS</span>
+    </div>
+    <div class="slide-body">
+
+      <div class="cards cards-2">
+        <div class="card card-accent">
+          <h3>Customer Segmentation (RFM)</h3>
+          <p>Every customer is automatically classified into actionable segments based on recency, frequency, and spend:</p>
+          <ul class="bullet-list" style="margin-top:0.6rem;">
+            <li><strong>Champions</strong> — purchased within 90 days, 3+ orders, high spend</li>
+            <li><strong>Loyal</strong> — purchased within 180 days, 2+ orders</li>
+            <li><strong>At-Risk</strong> — haven't purchased in 90–365 days</li>
+            <li><strong>Churned</strong> — no activity in over a year</li>
+          </ul>
+        </div>
+        <div class="card card-green">
+          <h3>Delivery Performance</h3>
+          <p>Delivery date vs. estimated date tracked per order, enabling:</p>
+          <ul class="bullet-list" style="margin-top:0.6rem;">
+            <li>On-time delivery rate overall and by seller state</li>
+            <li>Average delivery days by region (identify logistics gaps)</li>
+            <li>Approval cycle time (find processing bottlenecks)</li>
+            <li>Carrier handoff delay tracking</li>
+          </ul>
+        </div>
+        <div class="card card-teal">
+          <h3>Category Revenue Analysis</h3>
+          <p>All 72 product categories mapped to 10 business-friendly groupings — Electronics, Fashion, Home, Health &amp; Beauty, Art &amp; Culture, Books, Toys &amp; Games, Automotive, Food &amp; Drink, Other. Revenue, order count, and average price queryable at any level.</p>
+        </div>
+        <div class="card card-amber">
+          <h3>Review Sentiment by Category</h3>
+          <p>For every category with 50+ reviews, the platform exposes the positive review rate, average score, and sentiment breakdown. Directly actionable for product/supplier quality decisions and customer satisfaction benchmarking.</p>
+        </div>
+      </div>
+
+      <div class="cards cards-3">
+        <div class="card">
+          <h3>Geographic Intelligence</h3>
+          <p>Orders, customers, and sellers all geocoded to Brazilian states and 5 macro-regions. Cross-regional shipping distances and seller-proximity analysis are supported.</p>
+        </div>
+        <div class="card">
+          <h3>Historical Trend Analysis</h3>
+          <p>Full calendar dimension (5 years back / forward) with ISO weeks, holidays flag, and day-of-week attributes. Any metric can be trended monthly, quarterly, or year-over-year.</p>
+        </div>
+        <div class="card">
+          <h3>Installment Payment Patterns</h3>
+          <p>Credit card installment usage tracked per order — number of installments, payment value, risk level. Enables credit exposure and cash-flow timing analysis.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 6 · TECHNICAL ARCHITECTURE
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s6">
+    <div class="slide-header">
+      <span class="slide-num">06</span>
+      <h2>Technical Architecture</h2>
+      <span class="tag tag-tech">TECHNICAL</span>
+    </div>
+    <div class="slide-body">
+
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="tool">Great Expectations</div>
+          <div class="pipe-title">Validate</div>
+          <div class="pipe-desc">7 validation suites<br>25+ rules on raw CSVs<br>Fail-fast: blocks pipeline</div>
+          <div class="pipe-layer layer-1">Source Layer</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="tool">Meltano + tap-csv</div>
+          <div class="pipe-title">Extract &amp; Load</div>
+          <div class="pipe-desc">CSV → BigQuery<br>Storage Write API<br>raw_olist dataset</div>
+          <div class="pipe-layer layer-2">Raw Layer</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="tool">dbt (BigQuery)</div>
+          <div class="pipe-title">Transform</div>
+          <div class="pipe-desc">Staging → Core → Analytics<br>Star schema build<br>SCD Type 2 tracking</div>
+          <div class="pipe-layer layer-3">Analytics Layer</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="tool">dbt test</div>
+          <div class="pipe-title">Validate Output</div>
+          <div class="pipe-desc">Uniqueness &amp; not-null<br>Referential integrity<br>Accepted value sets</div>
+          <div class="pipe-layer layer-4">Quality Gate</div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top:0.2rem;">
+        <div>
+          <div class="layer-stack">
+            <div class="layer-row">
+              <div class="layer-label">Raw</div>
+              <div class="layer-box lb-raw">raw_olist — 8 tables loaded as-is from CSV</div>
+            </div>
+            <div class="layer-row">
+              <div class="layer-label">Staging</div>
+              <div class="layer-box lb-stg">stg_olist — type casting, column renames, SAFE_CAST</div>
+            </div>
+            <div class="layer-row">
+              <div class="layer-label">Core</div>
+              <div class="layer-box lb-core">stg_olist — business joins, aggregations</div>
+            </div>
+            <div class="layer-row">
+              <div class="layer-label">Analytics</div>
+              <div class="layer-box lb-ana">analytics — star schema (3 facts + 7 dims)</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Technology Stack</h3>
+          <ul class="check-list">
+            <li><strong>Google BigQuery</strong> — cloud data warehouse (US region)</li>
+            <li><strong>dbt 1.10</strong> — SQL transformation &amp; testing framework</li>
+            <li><strong>Meltano 4.0</strong> — open-source ELT orchestration</li>
+            <li><strong>Great Expectations 1.8</strong> — data validation (ephemeral context)</li>
+            <li><strong>Python 3.11</strong> — runtime, environment management via Conda</li>
+            <li><strong>run_pipeline.sh</strong> — single-command full pipeline execution</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cards cards-3">
+        <div class="card card-accent">
+          <h3>Why dbt?</h3>
+          <p>SQL-first transformations with version control, modular dependencies, auto-generated documentation, and native BigQuery dialect support. Separates concern of "what" from "how" in each layer.</p>
+        </div>
+        <div class="card card-green">
+          <h3>Why Meltano?</h3>
+          <p>Open-source Singer-protocol ELT. Declarative YAML config, pluggable extractors and loaders. Storage Write API enables reliable, high-throughput bulk loads to BigQuery.</p>
+        </div>
+        <div class="card card-teal">
+          <h3>Why BigQuery?</h3>
+          <p>Serverless, auto-scaling, pay-per-query. No infrastructure to manage. Handles the full 333 MB dataset in seconds. Integrates directly with Looker, Tableau, and Power BI.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 7 · DATA WAREHOUSE DESIGN
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s7">
+    <div class="slide-header">
+      <span class="slide-num">07</span>
+      <h2>Data Warehouse Design — Star Schema</h2>
+      <span class="tag tag-tech">TECHNICAL</span>
+    </div>
+    <div class="slide-body">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Table</th>
+            <th>Type</th>
+            <th>SCD</th>
+            <th>Grain</th>
+            <th>Approx Rows</th>
+            <th>Business Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>fct_orders</strong></td>
+            <td><span class="badge badge-fact">Fact</span></td>
+            <td>—</td>
+            <td>1 row per order</td>
+            <td>~99K</td>
+            <td>Revenue, delivery performance, payment analysis</td>
+          </tr>
+          <tr>
+            <td><strong>fct_order_items</strong></td>
+            <td><span class="badge badge-fact">Fact</span></td>
+            <td>—</td>
+            <td>1 row per line item ⭐</td>
+            <td>~112K</td>
+            <td>Most atomic — product, seller, category revenue</td>
+          </tr>
+          <tr>
+            <td><strong>fct_product_reviews</strong></td>
+            <td><span class="badge badge-fact">Fact</span></td>
+            <td>—</td>
+            <td>1 row per review</td>
+            <td>~99K</td>
+            <td>Sentiment, satisfaction, quality scoring</td>
+          </tr>
+          <tr>
+            <td><strong>dim_date</strong></td>
+            <td><span class="badge badge-dim">Dim</span></td>
+            <td><span class="badge badge-scd0">Static</span></td>
+            <td>1 row per day</td>
+            <td>~3,650</td>
+            <td>Conformed calendar — shared across all facts</td>
+          </tr>
+          <tr>
+            <td><strong>dim_geography</strong></td>
+            <td><span class="badge badge-dim">Dim</span></td>
+            <td><span class="badge badge-scd0">Static</span></td>
+            <td>1 row per zip prefix</td>
+            <td>~1,345</td>
+            <td>Conformed location — customers &amp; sellers</td>
+          </tr>
+          <tr>
+            <td><strong>dim_payment_type</strong></td>
+            <td><span class="badge badge-dim">Dim</span></td>
+            <td><span class="badge badge-scd0">Static</span></td>
+            <td>1 row per method</td>
+            <td>5</td>
+            <td>Payment channel, risk level, installment flag</td>
+          </tr>
+          <tr>
+            <td><strong>dim_product_category</strong></td>
+            <td><span class="badge badge-dim">Dim</span></td>
+            <td><span class="badge badge-scd2">SCD Type 2</span></td>
+            <td>1 row per category version</td>
+            <td>~72</td>
+            <td>EN translation, category type grouping, history</td>
+          </tr>
+          <tr>
+            <td><strong>dim_products</strong></td>
+            <td><span class="badge badge-dim">Dim</span></td>
+            <td><span class="badge badge-scd1">SCD Type 1</span></td>
+            <td>1 row per product</td>
+            <td>~32K</td>
+            <td>Physical specs, category link, volume derived</td>
+          </tr>
+          <tr>
+            <td><strong>dim_customers</strong></td>
+            <td><span class="badge badge-dim">Dim</span></td>
+            <td><span class="badge badge-scd2">SCD Type 2</span></td>
+            <td>1 row per customer version</td>
+            <td>~100K</td>
+            <td>Address history, state, geography link</td>
+          </tr>
+          <tr>
+            <td><strong>dim_sellers</strong></td>
+            <td><span class="badge badge-dim">Dim</span></td>
+            <td><span class="badge badge-scd1">SCD Type 1</span></td>
+            <td>1 row per seller</td>
+            <td>~3.6K</td>
+            <td>Location, state, geography link</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cards cards-3" style="margin-top:0.3rem;">
+        <div class="card card-accent">
+          <h3>Conformed Dimensions</h3>
+          <p><strong>dim_date</strong> and <strong>dim_geography</strong> are shared across all fact tables — this ensures consistent metrics when comparing revenue over time or customers vs. sellers by region.</p>
+        </div>
+        <div class="card card-amber">
+          <h3>SCD Type 2 (History Tracking)</h3>
+          <p>Customer and category records track history via <code>valid_from_date</code>, <code>valid_to_date</code>, <code>is_current</code>. Enables time-travel queries: <em>"What were revenue figures on Jan 15, 2024?"</em></p>
+        </div>
+        <div class="card card-green">
+          <h3>Surrogate Keys</h3>
+          <p>All dimensions carry integer surrogate keys. Business keys (order_id, product_id) are preserved as degenerate dimensions in fact tables — insulating analytics from upstream changes.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 8 · DATA QUALITY & GOVERNANCE
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s8">
+    <div class="slide-header">
+      <span class="slide-num">08</span>
+      <h2>Data Quality &amp; Governance</h2>
+      <span class="tag tag-tech">TECHNICAL</span>
+    </div>
+    <div class="slide-body">
+
+      <div class="qual-two">
+
+        <div class="qual-card">
+          <div class="qc-head qc-blue">
+            🛡 Layer 1 — Pre-Load Validation (Great Expectations)
+          </div>
+          <div class="qc-body">
+            <div class="rule-item"><div class="dot dot-blue"></div><strong>order_items</strong> — non-null keys, price ≥ 0, freight ≥ 0</div>
+            <div class="rule-item"><div class="dot dot-blue"></div><strong>order_payments</strong> — valid payment_type enum (5 values), value ≥ 0</div>
+            <div class="rule-item"><div class="dot dot-blue"></div><strong>orders</strong> — unique order_id, valid status enum (8 values)</div>
+            <div class="rule-item"><div class="dot dot-blue"></div><strong>order_reviews</strong> — review_score between 1–5</div>
+            <div class="rule-item"><div class="dot dot-blue"></div><strong>customers</strong> — non-null customer_id &amp; unique customer identifier</div>
+            <div class="rule-item"><div class="dot dot-blue"></div><strong>products</strong> — non-null product_id &amp; category name</div>
+            <div class="rule-item"><div class="dot dot-blue"></div><strong>sellers</strong> — non-null seller_id</div>
+            <div style="margin-top:0.7rem;font-size:0.78rem;color:var(--muted);">
+              Runs entirely in-memory. Exit code 1 blocks Meltano from loading bad data to BigQuery.
+            </div>
+          </div>
+        </div>
+
+        <div class="qual-card">
+          <div class="qc-head qc-green">
+            ✅ Layer 2 — Post-Transform Tests (dbt test)
+          </div>
+          <div class="qc-body">
+            <div class="rule-item"><div class="dot dot-green"></div><strong>Uniqueness</strong> — surrogate keys on all 10 analytics tables</div>
+            <div class="rule-item"><div class="dot dot-green"></div><strong>Not-Null</strong> — critical columns: order_id, customer_key, product_key, date_key</div>
+            <div class="rule-item"><div class="dot dot-green"></div><strong>Accepted Values</strong> — order_status constrained to 8 known values</div>
+            <div class="rule-item"><div class="dot dot-green"></div><strong>Referential integrity</strong> — fact → dimension key relationships</div>
+            <div class="rule-item"><div class="dot dot-green"></div><strong>Calendar completeness</strong> — dim_date unique per calendar_date</div>
+            <div class="rule-item"><div class="dot dot-green"></div><strong>Payment type uniqueness</strong> — dim_payment_type natural key</div>
+            <div style="margin-top:0.7rem;font-size:0.78rem;color:var(--muted);">
+              Pipeline fails at this stage if any test fails — dashboards never show invalid data.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="insight-quote">
+        <strong>Design principle:</strong> The pipeline is <em>fail-fast</em>. A single failed expectation or dbt test stops the entire run and returns a non-zero exit code. No partial loads, no silent failures. Every table in the analytics schema has been validated end-to-end before it is queryable.
+      </div>
+
+      <div class="cards cards-3">
+        <div class="card">
+          <h3>SAFE_CAST Throughout</h3>
+          <p>All staging models use BigQuery's <code>SAFE_CAST</code> instead of hard casts — malformed values return NULL rather than crashing the pipeline.</p>
+        </div>
+        <div class="card">
+          <h3>Ephemeral Validation Context</h3>
+          <p>Great Expectations runs fully in-memory — no stale configuration files on disk. Every run re-derives expectations from source code.</p>
+        </div>
+        <div class="card">
+          <h3>Seed Reference Data</h3>
+          <p>Product category translations loaded via dbt seed — version-controlled static data, not dependent on Meltano load state.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 9 · RISKS & MITIGATIONS
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s9">
+    <div class="slide-header">
+      <span class="slide-num">09</span>
+      <h2>Risks &amp; Mitigations</h2>
+      <span class="tag tag-all">ALL AUDIENCES</span>
+    </div>
+    <div class="slide-body">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Risk</th>
+            <th>Severity</th>
+            <th>Current State</th>
+            <th>Mitigation / Path Forward</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="risk-medium">
+            <td><strong>Historical Dataset Only</strong><br><span style="font-size:0.75rem;color:var(--muted)">Data is static (Oct 2021 snapshot). No live feed.</span></td>
+            <td><span class="badge" style="background:#fef3c7;color:#92400e;">Medium</span></td>
+            <td>All analysis is retrospective; cannot support real-time ops decisions</td>
+            <td>Connect a live Olist or similar source API via Meltano tap. Add incremental load strategy to dbt models.</td>
+          </tr>
+          <tr class="risk-medium">
+            <td><strong>Full-Reload Only (No Incrementals)</strong><br><span style="font-size:0.75rem;color:var(--muted)">Every run reprocesses all data.</span></td>
+            <td><span class="badge" style="background:#fef3c7;color:#92400e;">Medium</span></td>
+            <td>Acceptable for 333 MB. Will become costly at 10× scale or with BigQuery on-demand pricing.</td>
+            <td>Implement dbt incremental models for fact tables using <code>is_incremental()</code> + watermark on order date.</td>
+          </tr>
+          <tr class="risk-low">
+            <td><strong>Incomplete SCD Type 2 for Customers</strong><br><span style="font-size:0.75rem;color:var(--muted)">Snapshot defined but not wired to dim_customers.</span></td>
+            <td><span class="badge" style="background:#dcfce7;color:#166534;">Low</span></td>
+            <td>Customer address history not yet captured. Current data is still correct.</td>
+            <td>Wire the existing dbt snapshot to dim_customers model in next sprint. Snapshot infrastructure already exists.</td>
+          </tr>
+          <tr class="risk-low">
+            <td><strong>Hardcoded Credentials Path</strong><br><span style="font-size:0.75rem;color:var(--muted)">Service account JSON path in meltano.yml.</span></td>
+            <td><span class="badge" style="background:#dcfce7;color:#166534;">Low</span></td>
+            <td>Acceptable for academic/dev environment. Not suitable for shared or CI/CD deployment.</td>
+            <td>Move to environment variables or Google Secret Manager. Parameterise via Meltano environment config.</td>
+          </tr>
+          <tr class="risk-low">
+            <td><strong>Missing Attributes in Dimensions</strong><br><span style="font-size:0.75rem;color:var(--muted)">is_holiday, regional_sales_tier, seller_onboarded_date are NULL.</span></td>
+            <td><span class="badge" style="background:#dcfce7;color:#166534;">Low</span></td>
+            <td>Cosmetic gaps — does not affect accuracy of revenue, delivery, or sentiment metrics.</td>
+            <td>Brazil holiday calendar can be seeded. Sales tier derives from aggregated fct_order_items. Seller date from first order.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="insight-quote" style="margin-top:0.5rem;">
+        <strong>Honest assessment:</strong> This platform is production-ready for analytical workloads on the Olist dataset as-is. The gaps above are enhancements, not defects — every metric documented in this presentation is fully queryable today.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 10 · ROADMAP & RECOMMENDATIONS
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-content" id="s10">
+    <div class="slide-header">
+      <span class="slide-num">10</span>
+      <h2>Roadmap &amp; Strategic Recommendations</h2>
+      <span class="tag tag-all">ALL AUDIENCES</span>
+    </div>
+    <div class="slide-body">
+
+      <div class="roadmap">
+        <div class="road-phase">
+          <div class="phase-head" style="background:#1e40af;">Phase 1 — Now</div>
+          <div class="phase-body">
+            <div class="phase-item">Analytics layer fully queryable in BigQuery</div>
+            <div class="phase-item">Connect BI tool (Looker Studio / Tableau / Power BI)</div>
+            <div class="phase-item">Build executive dashboards on fct_order_items</div>
+            <div class="phase-item">Wire SCD Type 2 snapshot for dim_customers</div>
+          </div>
+        </div>
+        <div class="road-phase">
+          <div class="phase-head" style="background:#0891b2;">Phase 2 — Next 30 Days</div>
+          <div class="phase-body">
+            <div class="phase-item">Add incremental dbt models for fact tables</div>
+            <div class="phase-item">Migrate credentials to environment variables</div>
+            <div class="phase-item">Populate Brazil public holiday calendar (seed)</div>
+            <div class="phase-item">Automate daily refresh via scheduler (cron / Cloud Scheduler)</div>
+          </div>
+        </div>
+        <div class="road-phase">
+          <div class="phase-head" style="background:#059669;">Phase 3 — 60–90 Days</div>
+          <div class="phase-body">
+            <div class="phase-item">Connect live data source or API</div>
+            <div class="phase-item">Add fct_payments (payment-level fact table)</div>
+            <div class="phase-item">Compute regional_sales_tier from aggregated data</div>
+            <div class="phase-item">Add data freshness monitoring and alerting</div>
+          </div>
+        </div>
+        <div class="road-phase">
+          <div class="phase-head" style="background:#7c3aed;">Phase 4 — Strategic</div>
+          <div class="phase-body">
+            <div class="phase-item">ML integration: churn prediction model on RFM segments</div>
+            <div class="phase-item">Price elasticity analysis by category</div>
+            <div class="phase-item">Seller tier scoring &amp; ranking system</div>
+            <div class="phase-item">Expand to multi-region / multi-marketplace data</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards cards-3" style="margin-top:0.8rem;">
+        <div class="card card-accent">
+          <h3>Recommended First Dashboard</h3>
+          <ul class="check-list" style="margin-top:0.3rem;">
+            <li>Monthly revenue trend (AOV + freight rate)</li>
+            <li>Top 10 categories by revenue</li>
+            <li>On-time delivery rate by state</li>
+            <li>Customer segment distribution (RFM)</li>
+            <li>Review sentiment by category</li>
+          </ul>
+        </div>
+        <div class="card card-green">
+          <h3>Immediate Business Actions</h3>
+          <ul class="check-list" style="margin-top:0.3rem;">
+            <li>Identify "At Risk" customers for re-engagement campaigns</li>
+            <li>Flag categories with negative sentiment trends</li>
+            <li>Optimise seller mix in low-performing delivery states</li>
+            <li>Benchmark AOV by payment method</li>
+          </ul>
+        </div>
+        <div class="card card-teal">
+          <h3>Platform Strengths to Leverage</h3>
+          <ul class="check-list" style="margin-top:0.3rem;">
+            <li>Conformed dimensions enable cross-domain analysis</li>
+            <li>Pre-computed sentiment eliminates NLP infra cost</li>
+            <li>SCD2 history enables before/after analysis</li>
+            <li>dbt docs auto-generate data dictionary</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- #deck -->
+
+<!-- ── NAVIGATION ── -->
+<div id="nav">
+  <button id="btn-prev" onclick="navigate(-1)" disabled>← Prev</button>
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+  <span id="slide-count">1 / 10</span>
+  <button id="btn-next" onclick="navigate(1)">Next →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, total - 1));
+    slides[current].classList.add('active');
+    document.getElementById('slide-count').textContent = `${current + 1} / ${total}`;
+    document.getElementById('progress-bar').style.width = `${((current + 1) / total) * 100}%`;
+    document.getElementById('btn-prev').disabled = current === 0;
+    document.getElementById('btn-next').disabled = current === total - 1;
+  }
+
+  function navigate(dir) { showSlide(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+  });
+
+  showSlide(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "expectations": [
+    {
+      "id": "1d5eafe7-6bc7-420a-b677-2064481e48fb",
+      "kwargs": {
+        "column": "seller_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    }
+  ],
+  "id": "6181717e-c034-4b42-8c0a-2cabe406b424",
+  "meta": {
+    "great_expectations_version": "1.8.0"
+  },
+  "name": "olist_sellers_suite",
+  "notes": null
+}

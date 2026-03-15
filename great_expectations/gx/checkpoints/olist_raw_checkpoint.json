@@ -1,0 +1,36 @@
+{
+  "actions": [],
+  "id": "aca7d436-bab6-45af-ab04-5333c63ce9b2",
+  "name": "olist_raw_checkpoint",
+  "result_format": "SUMMARY",
+  "validation_definitions": [
+    {
+      "id": "8edf1645-5f72-4b98-b27b-e65063f41d47",
+      "name": "order_items_validation"
+    },
+    {
+      "id": "1753c07d-ed78-49c4-be49-baaaafbd607b",
+      "name": "order_payments_validation"
+    },
+    {
+      "id": "195e5131-cf7d-47b3-9008-0547021c0c45",
+      "name": "orders_validation"
+    },
+    {
+      "id": "ddb36ae3-ae95-473f-9a19-8cdb43483d55",
+      "name": "order_reviews_validation"
+    },
+    {
+      "id": "bc669b8c-bef4-4108-b6d9-bb854e81e050",
+      "name": "customers_validation"
+    },
+    {
+      "id": "c77f2bc7-abc4-4995-a66b-c26a830e812d",
+      "name": "products_validation"
+    },
+    {
+      "id": "d5ff68b6-da37-425f-a000-c3fbd21809d1",
+      "name": "sellers_validation"
+    }
+  ]
+}

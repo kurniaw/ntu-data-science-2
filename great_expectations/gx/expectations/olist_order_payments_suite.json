@@ -1,0 +1,73 @@
+{
+  "expectations": [
+    {
+      "id": "44982e47-169a-4184-b3dc-71d73de02df4",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "8717043e-37c7-4aaa-9a49-cf28974549eb",
+      "kwargs": {
+        "column": "payment_type"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "8e8ba55d-077f-42ba-a2d5-d1c4e5e87043",
+      "kwargs": {
+        "column": "payment_value"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "402ef5c3-a112-4be8-a1df-d33d24726c26",
+      "kwargs": {
+        "column": "payment_type",
+        "value_set": [
+          "credit_card",
+          "debit_card",
+          "boleto",
+          "voucher",
+          "not_defined"
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    },
+    {
+      "id": "41534bf4-fabe-4850-8229-dc5053676ab5",
+      "kwargs": {
+        "column": "payment_installments",
+        "min_value": 1.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "11f7bd5f-84e2-4f67-8e66-92f2772dab95",
+      "kwargs": {
+        "column": "payment_value",
+        "min_value": 0.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    }
+  ],
+  "id": "0d26257a-ad35-43b6-a39c-9052423b2577",
+  "meta": {
+    "great_expectations_version": "1.8.0"
+  },
+  "name": "olist_order_payments_suite",
+  "notes": null
+}

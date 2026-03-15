@@ -1,0 +1,94 @@
+{
+  "expectations": [
+    {
+      "id": "a884e159-a84e-495f-bda8-bc1a27e13e69",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "29de038b-cb35-44f6-bdc4-30ee9605bf9d",
+      "kwargs": {
+        "column": "order_item_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "ebc0012b-de33-4999-bdf3-828cea71fba6",
+      "kwargs": {
+        "column": "product_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "e80250e0-420c-45a8-81a4-d384074b694d",
+      "kwargs": {
+        "column": "seller_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "c1ed063d-851e-48d1-8e9f-c18d5c098143",
+      "kwargs": {
+        "column": "price"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "60868a15-c5eb-4538-8b58-11cce429ec17",
+      "kwargs": {
+        "column": "freight_value"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "03beb21f-149c-48a7-b2f0-30bb165ba964",
+      "kwargs": {
+        "column": "order_item_id",
+        "min_value": 1.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "a41f33fd-7712-4cce-a79c-646d90b1fd5b",
+      "kwargs": {
+        "column": "price",
+        "min_value": 0.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "f68788d8-7601-4589-bd66-ebfe7e267a20",
+      "kwargs": {
+        "column": "freight_value",
+        "min_value": 0.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    }
+  ],
+  "id": "953a4893-45a4-44f2-abf3-6d3d279f76b7",
+  "meta": {
+    "great_expectations_version": "1.8.0"
+  },
+  "name": "olist_order_items_suite",
+  "notes": null
+}

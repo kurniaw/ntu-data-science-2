@@ -1,0 +1,74 @@
+{
+  "expectations": [
+    {
+      "id": "daeae9b6-b286-4c84-b1a2-3be9e9bb5c4c",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "dd705a20-851c-4829-a64d-64582586e7ec",
+      "kwargs": {
+        "column": "customer_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "ddc7821e-b6a8-4b22-9536-5b9f63d3f409",
+      "kwargs": {
+        "column": "order_status"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "e846e667-9bb5-42cb-aad6-276555451848",
+      "kwargs": {
+        "column": "order_purchase_timestamp"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "d6e38e7c-4630-4ee1-a32f-b1eeeec98bf0",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_unique"
+    },
+    {
+      "id": "4f727101-4793-424f-8ff1-6e18ab89aa5b",
+      "kwargs": {
+        "column": "order_status",
+        "value_set": [
+          "delivered",
+          "shipped",
+          "canceled",
+          "invoiced",
+          "processing",
+          "unavailable",
+          "approved",
+          "created"
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    }
+  ],
+  "id": "c13e8653-a63e-4b81-91cf-045aa6826697",
+  "meta": {
+    "great_expectations_version": "1.8.0"
+  },
+  "name": "olist_orders_suite",
+  "notes": null
+}
