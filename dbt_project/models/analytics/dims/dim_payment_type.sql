@@ -20,20 +20,22 @@ enriched as (
   select 
     row_number() over (order by payment_type_name) as payment_type_key,
     payment_type_name,
-    case 
+    case
       when payment_type_name in ('credit_card', 'debit_card') then 'online'
-      when payment_type_name = 'boleto' then 'offline'
-      else 'other'
+      when payment_type_name = 'boleto'                        then 'offline'
+      when payment_type_name = 'voucher'                       then 'online'
+      when payment_type_name = 'not_defined'                   then 'unknown'
     end as payment_channel,
-    case 
+    case
       when payment_type_name = 'credit_card' then true
       else false
     end as requires_installments,
-    case 
-      when payment_type_name = 'credit_card' then 'medium'
-      when payment_type_name = 'debit_card' then 'low'
-      when payment_type_name = 'boleto' then 'high'
-      else 'unknown'
+    case
+      when payment_type_name = 'credit_card'  then 'medium'
+      when payment_type_name = 'debit_card'   then 'low'
+      when payment_type_name = 'boleto'       then 'high'
+      when payment_type_name = 'voucher'      then 'low'
+      when payment_type_name = 'not_defined'  then 'unknown'
     end as payment_risk_level
   from payment_types
 )
