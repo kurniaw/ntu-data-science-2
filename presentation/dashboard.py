@@ -456,6 +456,10 @@ def _pct(v: float) -> str:
 def _num(v: float) -> str:
     return f"{int(v):,}"
 
+def _fmt_cat(s: str) -> str:
+    """'bed_bath_table' → 'Bed Bath Table'"""
+    return s.replace("_", " ").title()
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE SETUP
@@ -600,6 +604,7 @@ with TAB_OVERVIEW:
     with col_r:
         with st.spinner():
             cat_df = q_category_revenue().head(6)
+        cat_df["category"] = cat_df["category"].map(_fmt_cat)
         fig = px.bar(
             cat_df, x="revenue", y="category", orientation="h",
             color_discrete_sequence=[PAL["teal"]],
@@ -628,6 +633,7 @@ with TAB_REVENUE:
         pay_df    = q_payment_mix()
         kpis      = q_overview_kpis().iloc[0]
 
+    cat_df["category"] = cat_df["category"].map(_fmt_cat)
     monthly["mom_growth"] = monthly["revenue"].pct_change() * 100
     peak = monthly.loc[monthly["revenue"].idxmax()]
     best = cat_df.iloc[0]
@@ -858,6 +864,7 @@ with TAB_PRODUCTS:
     with st.spinner("Loading product & sentiment data…"):
         rev_dist = q_review_distribution()
         sent_df  = q_sentiment_by_category()
+        sent_df["category_type"] = sent_df["category_type"].map(_fmt_cat)
         rating_m = q_monthly_rating()
         score    = q_review_summary().iloc[0]
         n_prod   = q_total_products()
@@ -994,7 +1001,7 @@ with TAB_GEO:
             mapbox_zoom=3,
             paper_bgcolor=BG,
             margin=dict(l=0, r=0, t=36, b=0),
-            height=460,
+            height=500,
             title=dict(text="Customer Order Demand Density", font=dict(color=FONT, size=13)),
             coloraxis_colorbar=dict(
                 title=dict(text="Orders", font=dict(color=MUTED)),
@@ -1039,8 +1046,8 @@ with TAB_GEO:
             mapbox_center={"lat": -14.2, "lon": -51.9},
             mapbox_zoom=3,
             paper_bgcolor=BG,
-            margin=dict(l=0, r=0, t=36, b=0),
-            height=420,
+            margin=dict(l=0, r=0, t=36, b=30),
+            height=550,
             title=dict(text="Customer Demand vs Seller Supply Coverage",
                        font=dict(color=FONT, size=13)),
             legend=dict(bgcolor=BG, font=dict(color=FONT, size=11),
