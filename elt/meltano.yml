@@ -17,15 +17,27 @@ plugins:
         - entity: order_items
           path: ../data/olist_order_items_dataset.csv
           keys: [order_item_id, order_id]
-        - entity: orders
-          path: ../data/olist_orders_dataset.csv
-          keys: [order_id]
         - entity: order_payments
           path: ../data/olist_order_payments_dataset.csv
           keys: [order_id,payment_sequential]
+        - entity: order_reviews
+          path: ../data/olist_order_reviews_dataset.csv
+          keys: [review_id]
+        - entity: orders
+          path: ../data/olist_orders_dataset.csv
+          keys: [order_id]
         - entity: products
           path: ../data/olist_products_dataset.csv
           keys: [product_id]
+        - entity: sellers
+          path: ../data/olist_sellers_dataset.csv
+          keys: [seller_id]
+        - entity: geolocation
+          path: ../data/olist_geolocation_dataset.csv
+          keys: [geolocation_zip_code_prefix, geolocation_lat, geolocation_lng]
+        - entity: product_category_name_translation
+          path: ../data/product_category_name_translation.csv
+          keys: [product_category_name]
   loaders:
   - name: target-bigquery
     variant: z3z1ma
