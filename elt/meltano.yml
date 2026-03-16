@@ -43,11 +43,12 @@ plugins:
     variant: z3z1ma
     pip_url: git+https://github.com/z3z1ma/target-bigquery.git setuptools<70
     config:
-      project: ntu-data-science-ai
+      project: $GCP_PROJECT_ID
+      credentials_path: $GCP_CREDENTIALS_PATH
       dataset: raw_olist
+      batch_size: 1000
       denormalized: true
       flattening_enabled: true
       flattening_max_depth: 1
       location: US
-      method: storage_write_api
-      credentials_path: /Users/kw/Documents/dev/apps/ntu-data-science-2/credentials/ntu-data-science-ai-4d35c69fac50.json
+      method: batch_job
