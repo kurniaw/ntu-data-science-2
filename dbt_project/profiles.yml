@@ -4,10 +4,10 @@ dbt_project:
     dev:
       type: bigquery
       method: service-account
-      project: ntu-data-science-ai
+      project: $GCP_PROJECT_ID
       dataset: stg_olist
       threads: 4
-      keyfile: "/Users/kw/Documents/dev/apps/ntu-data-science-2/credentials/ntu-data-science-ai-4d35c69fac50.json"
+      keyfile: $GCP_CREDENTIALS_PATH
       timeout_seconds: 300
       priority: interactive
       retries: 1

@@ -14,6 +14,15 @@ plugins:
         - entity: customers
           path: ../data/olist_customers_dataset.csv
           keys: [customer_id]
+        - entity: products
+          path: ../data/olist_products_dataset.csv
+          keys: [product_id]
+        - entity: sellers
+          path: ../data/olist_sellers_dataset.csv
+          keys: [seller_id]
+        - entity: orders
+          path: ../data/olist_orders_dataset.csv
+          keys: [order_id]
         - entity: order_items
           path: ../data/olist_order_items_dataset.csv
           keys: [order_item_id, order_id]
@@ -23,15 +32,6 @@ plugins:
         - entity: order_reviews
           path: ../data/olist_order_reviews_dataset.csv
           keys: [review_id]
-        - entity: orders
-          path: ../data/olist_orders_dataset.csv
-          keys: [order_id]
-        - entity: products
-          path: ../data/olist_products_dataset.csv
-          keys: [product_id]
-        - entity: sellers
-          path: ../data/olist_sellers_dataset.csv
-          keys: [seller_id]
         - entity: geolocation
           path: ../data/olist_geolocation_dataset.csv
           keys: [geolocation_zip_code_prefix, geolocation_lat, geolocation_lng]
@@ -51,4 +51,4 @@ plugins:
       flattening_enabled: true
       flattening_max_depth: 1
       location: US
-      method: batch_job
+      method: storage_write_api
