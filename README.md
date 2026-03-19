@@ -580,15 +580,9 @@ ORDER BY monetary DESC;
 
 ## 8. Analytics Dashboard
 
-An interactive executive dashboard built with Streamlit connects directly to the BigQuery analytics layer and presents all KPIs, charts, and insights across five views.
+An interactive executive dashboard built with Streamlit connects to local .parquets data analytics layer and presents all KPIs, charts, and insights across five views.
 
 ### Prerequisites
-
-Install the additional dashboard dependencies into the active conda environment:
-
-```bash
-pip install streamlit plotly "google-cloud-bigquery[pandas]" db-dtypes
-```
 
 These packages are already listed in `environment.yml` — if you are setting up a fresh environment they are included automatically:
 
