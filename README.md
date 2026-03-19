@@ -582,6 +582,8 @@ ORDER BY monetary DESC;
 
 An interactive executive dashboard built with Streamlit connects to local .parquets data analytics layer and presents all KPIs, charts, and insights across five views.
 
+Streamlit: [https://ntu-data-science-2-nmrjx8mmn3dpf3pgsufnyk.streamlit.app](https://ntu-data-science-2-nmrjx8mmn3dpf3pgsufnyk.streamlit.app)
+
 ### Prerequisites
 
 These packages are already listed in `environment.yml` — if you are setting up a fresh environment they are included automatically:
